@@ -90,11 +90,6 @@ export default {
         },
         type: "javascript/auto",
       },
-      // {
-      //   test: /\.css$/i,
-      //   use: [rspack.CssExtractRspackPlugin.loader, "css-loader"],
-      //   type: "javascript/auto",
-      // },
       {
         test: /\.css$/i,
         type: "css/auto",
