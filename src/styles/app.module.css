@@ -1,0 +1,27 @@
+.container {
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.h1Styles {
+  color: rgb(90, 215, 224);
+  font-size: 23px;
+  text-wrap: wrap;
+  text-transform: uppercase;
+}
+
+.counter {
+  max-width: 300px;
+}
+
+.counter button {
+  background-color: rgb(90, 215, 224);
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.counter button:hover {
+  background-color: rgb(14, 71, 75);
+}
