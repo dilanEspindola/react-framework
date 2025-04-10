@@ -8,7 +8,7 @@ export function App() {
 
   return (
     <div className={styles.container}>
-      <h1 className={`${styles.h1Styles}`}>hello</h1>
+      <h1 className={`${styles.h1Styles}`}>hiii</h1>
 
       <div className={styles.counter}>
         <p>Counter: {counter}</p>
