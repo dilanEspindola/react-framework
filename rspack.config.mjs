@@ -8,6 +8,9 @@ const env = "production";
 
 /** @type {import('@rspack/cli').Configuration} */
 export default {
+  resolve: {
+    extensions: [".js", ".jsx", ".ts", ".tsx"],
+  },
   mode: env,
   experiments: {
     css: true,
@@ -19,16 +22,25 @@ export default {
   output: {
     path: path.resolve(import.meta.dirname, "dist"),
     publicPath: "/",
-    filename: "[name].[contenthash].js",
-    chunkFilename: "[name].[contenthash].js",
+    filename: `${env === "development" ? "[name].js" : "[name].[contenthash].js"}`,
+    chunkFilename: `${env === "development" ? "[name].js" : "[name].[contenthash].js"}`,
     assetModuleFilename: "[name].[contenthash][ext]",
     clean: true,
   },
   devServer: {
     port: 3000,
-    static: {
-      directory: path.resolve(import.meta.dirname, "dist"),
-    },
+    // static: {
+    //   directory: path.resolve(import.meta.dirname, "dist"),
+    // },
+    // hot: true,
+    // liveReload: false,
+    // proxy: [
+    //   {
+    //     context: ["/"],
+    //     target: "http://localhost:4000",
+    //     changeOrigin: true,
+    //   },
+    // ],
   },
   optimization: {
     minimize: true,
@@ -64,11 +76,12 @@ export default {
         type: "javascript/auto",
       },
       {
-        test: /\.tsx?$/,
+        test: /\.tsx$/,
         exclude: /node_modules/,
         use: {
           loader: "builtin:swc-loader",
           options: {
+            sourceMap: true,
             jsc: {
               parser: {
                 syntax: "typescript",
@@ -79,8 +92,6 @@ export default {
               transform: {
                 react: {
                   runtime: "automatic",
-                  pragma: "React.createElement",
-                  pragmaFrag: "React.Fragment",
                   refresh: env === "development",
                   development: env === "development",
                 },
@@ -88,12 +99,15 @@ export default {
             },
           },
         },
-        type: "javascript/auto",
       },
       {
         test: /\.css$/i,
+        exclude: /node_modules/,
         type: "css/auto",
         parser: { namedExports: false },
+        options: {
+          modules: true,
+        },
       },
       {
         test: /\.ts$/,
@@ -105,6 +119,13 @@ export default {
               syntax: "typescript",
               decorators: true,
               dynamicImport: true,
+            },
+            transform: {
+              react: {
+                runtime: "automatic",
+                refresh: env === "development",
+                development: env === "development",
+              },
             },
           },
         },
