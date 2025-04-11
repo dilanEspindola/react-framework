@@ -4,12 +4,15 @@ import path from "path";
 
 const isDev = process.env.NODE_ENV === "development";
 
-const env = "production";
+const env = "development";
 
 /** @type {import('@rspack/cli').Configuration} */
 export default {
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
+    alias: {
+      "@/": path.resolve(import.meta.dirname, "src/"),
+    },
   },
   mode: env,
   experiments: {
@@ -32,15 +35,13 @@ export default {
     // static: {
     //   directory: path.resolve(import.meta.dirname, "dist"),
     // },
-    // hot: true,
-    // liveReload: false,
-    // proxy: [
-    //   {
-    //     context: ["/"],
-    //     target: "http://localhost:4000",
-    //     changeOrigin: true,
-    //   },
-    // ],
+    proxy: [
+      {
+        context: ["/"],
+        target: "http://localhost:4000",
+        changeOrigin: true,
+      },
+    ],
   },
   optimization: {
     minimize: true,
