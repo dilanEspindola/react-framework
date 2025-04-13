@@ -1,5 +1,6 @@
 import { rspack } from "@rspack/core";
 import ReactRefreshPlugin from "@rspack/plugin-react-refresh";
+import { readdir, readdirSync, writeFile } from "fs";
 import path from "path";
 
 const isDev = process.env.NODE_ENV === "development";
@@ -42,6 +43,46 @@ export default {
         changeOrigin: true,
       },
     ],
+    setupMiddlewares: (middlewares, _devServer) => {
+      const pagesDir = path.resolve(import.meta.dirname, "src/pages");
+      const routeMap = new Map();
+
+      const readAllFiles = (pagesDir) => {
+        if (!pagesDir) return;
+
+        const content = readdirSync(pagesDir, { encoding: "utf-8" });
+
+        content.forEach((element) => {
+          const pathEl = path.join(pagesDir, element);
+          if (pathEl.includes("page.tsx")) {
+            const url = pathEl.split("src")[1];
+            const fullPath = path.join("./src", url.replace(/\\/g, "/"));
+            console.log(pathEl);
+            const keyDirPath = url
+              .split("pages")[1]
+              .split("page.tsx")[0]
+              .replace(/\\/g, "/");
+
+            routeMap.set(keyDirPath, fullPath);
+          } else {
+            readAllFiles(pathEl);
+          }
+        });
+      };
+      readAllFiles(pagesDir);
+
+      const entries = Object.fromEntries(routeMap);
+
+      const jsObject = `export const routes = ${JSON.stringify(entries, null, 2)}`;
+
+      writeFile(`${import.meta.dirname}/src/routes.ts`, jsObject, (err) => {
+        if (err) throw new Error("Error writing file: " + err);
+
+        console.log("file written successfully");
+      });
+
+      return middlewares;
+    },
   },
   optimization: {
     minimize: true,
