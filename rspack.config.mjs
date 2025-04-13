@@ -1,7 +1,8 @@
 import { rspack } from "@rspack/core";
 import ReactRefreshPlugin from "@rspack/plugin-react-refresh";
-import { watch, readdirSync, writeFile } from "fs";
+import { watch, readdirSync, writeFile, readFileSync } from "fs";
 import path from "path";
+import { cwd } from "process";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -57,13 +58,19 @@ export default {
             const pathEl = path.join(pagesDir, element);
             if (pathEl.includes("page.tsx")) {
               const url = pathEl.split("src")[1];
-              const fullPath = path.join("./src", url.replace(/\\/g, "/"));
+              const filePath = path.join("./src", url.replace(/\\/g, "/"));
+              const fileContent = readFileSync(`${cwd()}/${filePath}`, {
+                encoding: "utf-8",
+              });
               const keyDirPath = url
                 .split("pages")[1]
                 .split("page.tsx")[0]
                 .replace(/\\/g, "/");
 
-              routeMap.set(keyDirPath, fullPath);
+              routeMap.set(keyDirPath, {
+                filePath,
+                isSSR: fileContent.includes("use ssr"),
+              });
             } else {
               readAllFiles(pathEl);
             }

@@ -1,9 +1,30 @@
 export const routes = {
-  "/home/": "src\\pages\\home\\page.tsx",
-  "/home/profile/": "src\\pages\\home\\profile\\page.tsx",
-  "/login/": "src\\pages\\login\\page.tsx",
-  "/": "src\\pages\\page.tsx",
-  "/post/": "src\\pages\\post\\page.tsx",
-  "/post/[postId]/": "src\\pages\\post\\[postId]\\page.tsx",
-  "/register/": "src\\pages\\register\\page.tsx"
+  "/home/": {
+    "filePath": "src\\pages\\home\\page.tsx",
+    "isSSR": true
+  },
+  "/home/profile/": {
+    "filePath": "src\\pages\\home\\profile\\page.tsx",
+    "isSSR": false
+  },
+  "/login/": {
+    "filePath": "src\\pages\\login\\page.tsx",
+    "isSSR": false
+  },
+  "/": {
+    "filePath": "src\\pages\\page.tsx",
+    "isSSR": false
+  },
+  "/post/": {
+    "filePath": "src\\pages\\post\\page.tsx",
+    "isSSR": false
+  },
+  "/post/[postId]/": {
+    "filePath": "src\\pages\\post\\[postId]\\page.tsx",
+    "isSSR": true
+  },
+  "/register/": {
+    "filePath": "src\\pages\\register\\page.tsx",
+    "isSSR": false
+  }
 }
