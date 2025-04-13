@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev:client": "rspack serve",
+    "dev:client": "rspack serve --mode development",
     "build": "rspack build",
     "start": "rspack preview",
     "dev:server": "bun --hot server/server.ts"

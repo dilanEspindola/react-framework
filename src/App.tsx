@@ -8,11 +8,11 @@ export function App() {
 
   return (
     <div className={styles.container}>
-      {/* <h1 className={`${styles.h1Styles}`}>hiii</h1> */}
+      <h1 className={`${styles.h1Styles}`}>hola :Ds</h1>
 
       <div className={styles.counter}>
-        <p>Counter: {counter}</p>
-        <button onClick={() => setCounter(counter + 1)}>Increment</button>
+        <p>Counters: {counter}</p>
+        <button onClick={() => setCounter(counter + 1)}>incrementar</button>
       </div>
       <img
         src={image}

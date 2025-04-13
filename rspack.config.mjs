@@ -3,6 +3,7 @@ import ReactRefreshPlugin from "@rspack/plugin-react-refresh";
 import { watch, readdirSync, writeFile, readFileSync } from "fs";
 import path from "path";
 import { cwd } from "process";
+import { ManifestPlugin } from "./plugins.mjs";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -25,15 +26,19 @@ export default {
   },
   entry: { main: "./src/index.tsx" },
   output: {
-    path: path.resolve(import.meta.dirname, "dist"),
+    path: `${env === "development" ? `${path.resolve(import.meta.dirname, "dev")}` : `${path.resolve(import.meta.dirname, "dist")}`}`,
     publicPath: "/",
-    filename: `${env === "development" ? "[name].js" : "[name].[contenthash].js"}`,
+    filename: `${env === "development" ? "[name].js" : "[name].js"}`,
     chunkFilename: `${env === "development" ? "[name].js" : "[name].[contenthash].js"}`,
     assetModuleFilename: "[name].[contenthash][ext]",
     clean: true,
   },
   devServer: {
+    hot: env === "development",
     port: 3000,
+    devMiddleware: {
+      writeToDisk: true,
+    },
     // static: {
     //   directory: path.resolve(import.meta.dirname, "dist"),
     // },
@@ -195,8 +200,12 @@ export default {
     ],
   },
   plugins: [
-    new rspack.HtmlRspackPlugin({ template: "./index.html", minify: true }),
+    new rspack.HtmlRspackPlugin({
+      template: "./index.html",
+      minify: false,
+    }),
     env === "development" && new ReactRefreshPlugin(),
-    env === "development" && new rspack.HotModuleReplacementPlugin(),
+    // env === "development" && new rspack.HotModuleReplacementPlugin(),
+    new ManifestPlugin(),
   ],
 };
