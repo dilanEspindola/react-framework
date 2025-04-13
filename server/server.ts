@@ -2,22 +2,12 @@ import express from "express";
 import { readdir, readFile } from "fs";
 import path from "path";
 import { cwd } from "process";
+import { routes } from "../src/routes";
 
 const app = express();
 const PORT = 4000;
 
-const pagesDIr = cwd() + "/src/pages";
-
-function getPages() {}
-
-const pages = path.resolve(pagesDIr);
-
-readdir(pages, (err, pages) => {
-  if (err) {
-    console.log(err);
-  }
-  console.log(pages);
-});
+const homePage = await import("../src/pages/home/page.tsx");
 
 app.get("/pages", (req, res) => {
   res.json({ message: "pages" });
