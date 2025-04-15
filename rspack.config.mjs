@@ -42,13 +42,13 @@ export default {
     // static: {
     //   directory: path.resolve(import.meta.dirname, "dist"),
     // },
-    proxy: [
-      {
-        context: ["/"],
-        target: "http://localhost:4000",
-        changeOrigin: true,
-      },
-    ],
+    // proxy: [
+    //   {
+    //     context: ["/"],
+    //     target: "http://localhost:4000",
+    //     changeOrigin: true,
+    //   },
+    // ],
     setupMiddlewares: (middlewares, _devServer) => {
       const pagesDir = path.resolve(import.meta.dirname, "src/pages");
       const routeMap = new Map();
@@ -73,8 +73,13 @@ export default {
                 .replace(/\\/g, "/");
 
               routeMap.set(keyDirPath, {
-                filePath,
+                filePath: filePath.replace(/\\/g, "/"),
                 isSSR: fileContent.includes("use ssr"),
+                path:
+                  keyDirPath === "/"
+                    ? "/"
+                    : keyDirPath.replace(/(?:^\/+)|(?:\/+$)/g, ""),
+                component: `() => import("${filePath}")`,
               });
             } else {
               readAllFiles(pathEl);
@@ -83,9 +88,18 @@ export default {
         };
         readAllFiles(pagesDir);
 
-        const entries = Object.fromEntries(routeMap);
-
-        const jsObject = `export const routes = ${JSON.stringify(entries, null, 2)}`;
+        const jsObject = `export const routes = {
+            ${Array.from(routeMap.entries())
+              .map(([path, config]) => {
+                return `"${path}": {
+                  filePath: "${config.filePath}",
+                  isSSR: ${config.isSSR},
+                  path: "${config.path}",
+                  component: () => import("${config.filePath.replace(/^src\//, "./")}")
+                }`;
+              })
+              .join(",\n")}
+        };`;
 
         writeFile(`${import.meta.dirname}/src/routes.ts`, jsObject, (err) => {
           if (err) throw new Error("Error writing file: " + err);
@@ -202,7 +216,7 @@ export default {
   plugins: [
     new rspack.HtmlRspackPlugin({
       template: "./index.html",
-      minify: false,
+      minify: env === "production",
     }),
     env === "development" && new ReactRefreshPlugin(),
     // env === "development" && new rspack.HotModuleReplacementPlugin(),

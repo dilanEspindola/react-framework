@@ -2,8 +2,8 @@ import express from "express";
 import path from "path";
 import { cwd } from "process";
 import { routes } from "../src/routes";
-import { renderToString } from "react-dom/server";
-import React, { Component } from "react";
+import { renderToPipeableStream, renderToString } from "react-dom/server";
+import React from "react";
 
 interface RoutePropierties {
   filePath: string;
@@ -31,13 +31,18 @@ for (let key of routesKeys) {
 
   const scriptFilename = isDev ? "/main.js" : "/main.js";
 
-  if (route.isSSR) {
+  if (!route.isSSR) {
     const keyParsed = parseUrl(key);
-    app.get(keyParsed, async (req, res) => {
-      const componentModule = await import(`${cwd()}/${route.filePath}`);
+
+    app.get("/", async (req, res) => {
+      const componentModule = await import(
+        `${path.resolve()}/${route.filePath}`
+      );
       console.log(componentModule.default());
 
-      const html = renderToString(componentModule.default());
+      const Component = componentModule.default;
+
+      const html = renderToString(React.createElement(Component));
 
       const mainHtml = `
       <!DOCTYPE html>
