@@ -19,15 +19,19 @@ const routeList = Object.values(routes).map((route) => {
   };
 });
 
-console.log(routeList);
-
 const root = createRoot(app!);
 root.render(
   <StrictMode>
     {routeList.map(({ component: Component, path }) => (
-      <Suspense fallback={<div>Loading...</div>} key={Component.name}>
-        <Route Component={Component} path={path} key={Component.name} />
-      </Suspense>
+      <Route
+        Component={() => (
+          <Suspense fallback={<div>Loading...</div>}>
+            <Component />
+          </Suspense>
+        )}
+        path={path}
+        key={path}
+      />
     ))}
   </StrictMode>
 );

@@ -2,7 +2,6 @@ import { useState } from "react";
 import image from "../../public/image2.jpg";
 import { getRandomToken } from "../helpers/get-token.ts";
 import styles from "../styles/app.module.css";
-import Router from "../components/router.tsx";
 import { Link } from "../components/link.tsx";
 
 const IndexPage = () => {

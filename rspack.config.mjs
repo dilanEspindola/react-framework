@@ -8,9 +8,11 @@ import { ManifestPlugin } from "./plugins.mjs";
 const isDev = process.env.NODE_ENV === "development";
 
 const env = "development";
+// const env = "production";
 
 /** @type {import('@rspack/cli').Configuration} */
 export default {
+  cache: true,
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
     alias: {
@@ -29,9 +31,10 @@ export default {
     path: `${env === "development" ? `${path.resolve(import.meta.dirname, "dev")}` : `${path.resolve(import.meta.dirname, "dist")}`}`,
     publicPath: "/",
     filename: `${env === "development" ? "[name].js" : "[name].js"}`,
-    chunkFilename: `${env === "development" ? "[name].js" : "[name].[contenthash].js"}`,
+    chunkFilename: `${env === "development" ? "./chunks/[name].js" : "./chunks/[name].[contenthash].js"}`,
     assetModuleFilename: "[name].[contenthash][ext]",
     clean: true,
+    sourceMapFilename: "[file].map",
   },
   devServer: {
     hot: env === "development",
@@ -122,6 +125,26 @@ export default {
     minimize: true,
     splitChunks: {
       chunks: "all",
+      minSize: 30000,
+      maxSize: 0,
+      minChunks: 1,
+      cacheGroups: {
+        pagesDir: {
+          // test: /[\\/]pages[\\/]/,
+          test: /[\\/]src[\\/]pages[\\/].*\.tsx?$/,
+          // test: "./src/pages/**/*",
+          name(module, chunks, cacheGroupKey) {
+            console.log("chunks", chunks);
+            console.log("cacheGroupKey", cacheGroupKey);
+            const match = module.resource.match(
+              /src[\\/]pages[\\/]([^\\/]+)\/page\.tsx?$/
+            );
+            return match ? match[1] : "page";
+          },
+          chunks: "async",
+          filename: "pages/[name].[contenthash].js",
+        },
+      },
     },
   },
   module: {

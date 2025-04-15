@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "../../styles/home.module.css";
+import { Link } from "../../components/link";
 
 const HomePage = () => {
   const [counter, setCounter] = useState(0);
@@ -25,6 +26,8 @@ const HomePage = () => {
         <p>Counter: {counter}</p>
         <button onClick={increment}>increment</button>
       </div>
+
+      <Link to="/">go to index</Link>
     </div>
   );
 };

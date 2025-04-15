@@ -2,7 +2,7 @@ import { useEffect, useState, type JSX } from "react";
 
 interface Props {
   path: string;
-  Component: any;
+  Component: () => JSX.Element;
 }
 
 const Route = (props: Props) => {
@@ -21,7 +21,9 @@ const Route = (props: Props) => {
     };
   }, []);
 
-  return currentPath === path ? <Component /> : null;
+  const pathTransformed = path === "/" ? "/" : path.replace("", "/");
+
+  return currentPath === pathTransformed ? <Component /> : null;
 };
 
 export default Route;
