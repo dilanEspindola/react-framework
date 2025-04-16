@@ -2,7 +2,6 @@ import { useState } from "react";
 import image from "../public/image2.jpg";
 import { getRandomToken } from "./helpers/get-token.ts";
 import styles from "./styles/app.module.css";
-import HomePage from "./pages/home/page.tsx";
 import { Link } from "./components/link.tsx";
 
 export function App() {
@@ -26,10 +25,6 @@ export function App() {
       />
 
       <p>Random Token: {getRandomToken()}</p>
-
-      <Link to="/home">
-        <p>go to home</p>
-      </Link>
     </div>
   );
 }

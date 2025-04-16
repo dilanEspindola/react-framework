@@ -6,13 +6,15 @@ import {
   onRecoverableErrorProd,
   onUncaughtErrorProd,
 } from "./report-error";
+import { Switch, Route } from "wouter";
+import HomePage from "./pages/home/page";
 
 import "./styles/global.css";
-import Route from "./components/router";
 
 const app = document.getElementById("root");
 
 const routeList = Object.values(routes).map((route) => {
+  console.log("path", route.path);
   return {
     ...route,
     component: lazy(() => route.component()),
@@ -22,19 +24,30 @@ const routeList = Object.values(routes).map((route) => {
 const root = createRoot(app!);
 root.render(
   <StrictMode>
-    {routeList.map(({ component: Component, path }) => (
-      <Route
-        Component={() => (
-          <Suspense fallback={<div>Loading...</div>}>
-            <Component />
-          </Suspense>
-        )}
-        path={path}
-        key={path}
-      />
-    ))}
+    <Switch>
+      <Suspense fallback={<div>Loading...</div>}>
+        {routeList.map(({ component, path }) => (
+          <Route component={component} path={path} key={path} />
+        ))}
+      </Suspense>
+    </Switch>
   </StrictMode>
 );
+// root.render(
+//   <StrictMode>
+//     {routeList.map(({ component: Component, path }) => (
+//       <Route
+//         Component={() => (
+//           <Suspense fallback={<div>Loading...</div>}>
+//             <Component />
+//           </Suspense>
+//         )}
+//         path={path}
+//         key={path}
+//       />
+//     ))}
+//   </StrictMode>
+// );
 
 // hydrateRoot(app!, <Home />, {
 //   onCaughtError: onCaughtErrorProd,
