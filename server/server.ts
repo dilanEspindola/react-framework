@@ -10,11 +10,13 @@ interface RoutePropierties {
   isSSR: boolean;
 }
 
-const isDev = "development";
+const isDev = process.env.NODE_ENV === "development";
 const app = express();
 const PORT = 4000;
 
-app.use(express.static(path.join(cwd(), "dev")));
+app.use(express.static(path.join(path.resolve(), "dev")));
+
+const filesPath = path.join(path.resolve(), "dev");
 
 const routesKeys = Object.keys(routes);
 
@@ -31,10 +33,10 @@ for (let key of routesKeys) {
 
   const scriptFilename = isDev ? "/main.js" : "/main.js";
 
-  if (!route.isSSR) {
-    const keyParsed = parseUrl(key);
+  const keyParsed = parseUrl(key);
 
-    app.get("/", async (req, res) => {
+  app.use(keyParsed, async (req, res) => {
+    if (route.isSSR) {
       const componentModule = await import(
         `${path.resolve()}/${route.filePath}`
       );
@@ -60,9 +62,12 @@ for (let key of routesKeys) {
       </html>
       `;
 
-      res.send(mainHtml);
-    });
-  }
+      return res.send(mainHtml);
+    }
+
+    const htmlFile = path.join(filesPath, "index.html");
+    res.sendFile(htmlFile);
+  });
 }
 
 app.listen(PORT, () => {

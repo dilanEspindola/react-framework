@@ -37,21 +37,22 @@ export default {
     sourceMapFilename: "[file].map",
   },
   devServer: {
+    historyApiFallback: true,
     hot: env === "development",
     port: 3000,
     devMiddleware: {
       writeToDisk: true,
     },
-    // static: {
-    //   directory: path.resolve(import.meta.dirname, "dist"),
-    // },
-    // proxy: [
-    //   {
-    //     context: ["/"],
-    //     target: "http://localhost:4000",
-    //     changeOrigin: true,
-    //   },
-    // ],
+    static: {
+      directory: `${path.resolve(import.meta.dirname, "dev")}`,
+    },
+    proxy: [
+      {
+        context: ["/"],
+        target: "http://localhost:4000",
+        changeOrigin: true,
+      },
+    ],
     setupMiddlewares: (middlewares, _devServer) => {
       const pagesDir = path.resolve(import.meta.dirname, "src/pages");
       const routeMap = new Map();
@@ -134,8 +135,6 @@ export default {
           test: /[\\/]src[\\/]pages[\\/].*\.tsx?$/,
           // test: "./src/pages/**/*",
           name(module, chunks, cacheGroupKey) {
-            console.log("chunks", chunks);
-            console.log("cacheGroupKey", cacheGroupKey);
             const match = module.resource.match(
               /src[\\/]pages[\\/]([^\\/]+)\/page\.tsx?$/
             );
