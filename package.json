@@ -4,10 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev:client": "rspack serve --mode development",
+    "dev:client": " rspack serve --mode development",
     "build": "rspack build",
     "start": "rspack preview",
-    "dev:server": "bun --hot server/server.ts"
+    "dev:server": "bun --hot server/server.tsx"
   },
   "devDependencies": {
     "@rspack/cli": "^1.3.4",

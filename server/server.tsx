@@ -3,14 +3,20 @@ import path from "path";
 import { cwd } from "process";
 import { routes } from "../src/routes";
 import { renderToPipeableStream, renderToString } from "react-dom/server";
+import { Router } from "wouter";
 import React from "react";
+import { read, readFileSync } from "fs";
 
 interface RoutePropierties {
   filePath: string;
   isSSR: boolean;
+  path: string;
 }
 
-const isDev = process.env.NODE_ENV === "development";
+// console.log(process.env.NODE_ENV);
+
+// const isDev = process.env.NODE_ENV === "development";
+const isDev = "development";
 const app = express();
 const PORT = 4000;
 
@@ -35,12 +41,11 @@ for (let key of routesKeys) {
 
   const keyParsed = parseUrl(key);
 
-  app.use(keyParsed, async (req, res) => {
+  app.get(keyParsed, async (req, res) => {
     if (route.isSSR) {
       const componentModule = await import(
         `${path.resolve()}/${route.filePath}`
       );
-      console.log(componentModule.default());
 
       const Component = componentModule.default;
 
@@ -65,8 +70,27 @@ for (let key of routesKeys) {
       return res.send(mainHtml);
     }
 
+    // console.log("path", route.filePath);
+    // console.log("keyParsed", keyParsed);
+
+    const componentModule = await import(`${path.resolve()}/${route.filePath}`);
+    const Component = componentModule.default;
+
+    const htmlComponent = renderToString(
+      <Router ssrPath={keyParsed}>
+        <Component />
+      </Router>
+    );
+
     const htmlFile = path.join(filesPath, "index.html");
-    res.sendFile(htmlFile);
+
+    const fileContent = readFileSync(htmlFile, "utf-8");
+    const htmlUpdated = fileContent.replace(
+      '<div id="root"></div>',
+      `<div id="root">${htmlComponent}</div>`
+    );
+
+    res.send(htmlUpdated);
   });
 }
 
