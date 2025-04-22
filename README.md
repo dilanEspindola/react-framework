@@ -35,3 +35,5 @@ bun run dev:server
 And then you can start using the app like a normal react app.
 
 Project is using directory-based routing to handle the routes.
+
+Every page/route goes inside ./pages folder with the file named page.tsx
