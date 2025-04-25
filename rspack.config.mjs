@@ -1,23 +1,55 @@
 import { rspack } from "@rspack/core";
 import ReactRefreshPlugin from "@rspack/plugin-react-refresh";
-import { watch, readdirSync, writeFile, readFileSync } from "fs";
+import {
+  watch,
+  readdirSync,
+  writeFile,
+  readFileSync,
+  existsSync,
+  readdir,
+} from "fs";
 import path from "path";
 import { cwd } from "process";
 import { ManifestPlugin } from "./plugins.mjs";
 
 const isDev = process.env.NODE_ENV === "development";
-
 const env = "development";
 // const env = "production";
+
+function getAliases() {
+  const folders = readdir(
+    path.resolve(import.meta.dirname, "src"),
+    { withFileTypes: true },
+    (err, files) => {
+      if (err) {
+        console.error("Error reading directory:", err);
+        return;
+      }
+
+      console.log(files);
+    }
+  );
+
+  return {
+    "@/*": path.resolve(import.meta.dirname, "src"),
+    public: path.resolve(import.meta.dirname, "public"),
+    "@/helpers": path.resolve(import.meta.dirname, "src/helpers"),
+    "@/components": path.resolve(import.meta.dirname, "src/components"),
+  };
+}
 
 /** @type {import('@rspack/cli').Configuration} */
 export default {
   cache: true,
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
-    alias: {
-      "@/": path.resolve(import.meta.dirname, "src/"),
-    },
+    alias: getAliases(),
+    // alias: {
+    //   "@/*": path.resolve(import.meta.dirname, "src"),
+    //   public: path.resolve(import.meta.dirname, "public"),
+    //   "@/helpers": path.resolve(import.meta.dirname, "src/helpers"),
+    //   "@/components": path.resolve(import.meta.dirname, "src/components"),
+    // },
   },
   mode: env,
   experiments: {
@@ -28,16 +60,24 @@ export default {
   },
   entry: { main: "./src/index.tsx" },
   output: {
-    path: `${env === "development" ? `${path.resolve(import.meta.dirname, "dev")}` : `${path.resolve(import.meta.dirname, "dist")}`}`,
+    path: `${
+      env === "development"
+        ? `${path.resolve(import.meta.dirname, "dev")}`
+        : `${path.resolve(import.meta.dirname, "dist")}`
+    }`,
     publicPath: "/",
     filename: `${env === "development" ? "[name].js" : "[name].js"}`,
-    chunkFilename: `${env === "development" ? "./chunks/[name].js" : "./chunks/[name].[contenthash].js"}`,
+    chunkFilename: `${
+      env === "development"
+        ? "./chunks/[name].js"
+        : "./chunks/[name].[contenthash].js"
+    }`,
     assetModuleFilename: "[name].[contenthash][ext]",
     clean: true,
     sourceMapFilename: "[file].map",
   },
   devServer: {
-    historyApiFallback: true,
+    historyApiFallback: false,
     hot: env === "development",
     port: 3000,
     devMiddleware: {
@@ -45,81 +85,6 @@ export default {
     },
     static: {
       directory: `${path.resolve(import.meta.dirname, "dev")}`,
-    },
-    proxy: [
-      {
-        context: ["/"],
-        target: "http://localhost:4000",
-        changeOrigin: true,
-      },
-    ],
-    setupMiddlewares: (middlewares, _devServer) => {
-      const pagesDir = path.resolve(import.meta.dirname, "src/pages");
-      const routeMap = new Map();
-
-      const generateRouteFile = () => {
-        const readAllFiles = (pagesDir) => {
-          if (!pagesDir) return;
-
-          const content = readdirSync(pagesDir, { encoding: "utf-8" });
-
-          content.forEach((element) => {
-            const pathEl = path.join(pagesDir, element);
-            if (pathEl.includes("page.tsx")) {
-              const url = pathEl.split("src")[1];
-              const filePath = path.join("./src", url.replace(/\\/g, "/"));
-              const fileContent = readFileSync(`${cwd()}/${filePath}`, {
-                encoding: "utf-8",
-              });
-              const keyDirPath = url
-                .split("pages")[1]
-                .split("page.tsx")[0]
-                .replace(/\\/g, "/");
-
-              routeMap.set(keyDirPath, {
-                filePath: filePath.replace(/\\/g, "/"),
-                isSSR: fileContent.includes("use ssr"),
-                path:
-                  keyDirPath === "/"
-                    ? "/"
-                    : keyDirPath.replace(/(?:^\/+)|(?:\/+$)/g, ""),
-                component: `() => import("${filePath}")`,
-              });
-            } else {
-              readAllFiles(pathEl);
-            }
-          });
-        };
-        readAllFiles(pagesDir);
-
-        const jsObject = `export const routes = {
-            ${Array.from(routeMap.entries())
-              .map(([path, config]) => {
-                return `"${path}": {
-                  filePath: "${config.filePath}",
-                  isSSR: ${config.isSSR},
-                  path: "${config.path}",
-                  component: () => import("${config.filePath.replace(/^src\//, "./")}")
-                }`;
-              })
-              .join(",\n")}
-        };`;
-
-        writeFile(`${import.meta.dirname}/src/routes.ts`, jsObject, (err) => {
-          if (err) throw new Error("Error writing file: " + err);
-
-          console.log("file written successfully");
-        });
-      };
-
-      generateRouteFile();
-
-      watch(pagesDir, { recursive: true }, (evenType, filename) => {
-        console.log(`File ${filename} was ${evenType}`);
-        generateRouteFile();
-      });
-
-      return middlewares;
     },
   },
   optimization: {
