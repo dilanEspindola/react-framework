@@ -8,6 +8,7 @@ import {
 } from "./report-error";
 import { Switch, Route } from "wouter";
 import HomePage from "./pages/home/page";
+import MainPage from "./pages/page";
 
 import "./styles/global.css";
 
@@ -21,36 +22,56 @@ const routeList = Object.values(routes).map((route) => {
   };
 });
 
-const root = createRoot(app!);
-root.render(
-  <StrictMode>
-    <Switch>
-      <Suspense fallback={<div>Loading...</div>}>
-        {routeList.map(({ component, path }) => (
-          <Route component={component} path={path} key={path} />
-        ))}
-      </Suspense>
-    </Switch>
-  </StrictMode>
-);
+// const root = createRoot(app!);
 // root.render(
 //   <StrictMode>
-//     {routeList.map(({ component: Component, path }) => (
-//       <Route
-//         Component={() => (
-//           <Suspense fallback={<div>Loading...</div>}>
-//             <Component />
-//           </Suspense>
-//         )}
-//         path={path}
-//         key={path}
-//       />
-//     ))}
+//     <Switch>
+//       {routeList.map(({ component, path }) => (
+//         <Route component={component} path={path} key={path} />
+//       ))}
+//     </Switch>
 //   </StrictMode>
 // );
 
-// hydrateRoot(app!, <Home />, {
-//   onCaughtError: onCaughtErrorProd,
-//   onRecoverableError: onRecoverableErrorProd,
-//   onUncaughtError: onUncaughtErrorProd,
-// });
+// if (window.location.pathname === "/") {
+//   const root = createRoot(app!);
+//   root.render(
+//     <StrictMode>
+//       <Switch>
+//         <Route path="/" component={MainPage} />
+//       </Switch>
+//     </StrictMode>
+//   );
+// } else {
+//   hydrateRoot(
+//     app!,
+//     <StrictMode>
+//       <Switch>
+//         {routeList.map(({ component, path }) => (
+//           <Route component={component} path={path} key={path} />
+//         ))}
+//       </Switch>
+//     </StrictMode>,
+//     {
+//         onCaughtError: onCaughtErrorProd,
+//         onRecoverableError: onRecoverableErrorProd,
+//         onUncaughtError: onUncaughtErrorProd,
+//     }
+//   );
+// }
+
+hydrateRoot(
+  app!,
+  <StrictMode>
+    <Switch>
+      {routeList.map(({ component, path }) => (
+        <Route component={component} path={path} key={path} />
+      ))}
+    </Switch>
+  </StrictMode>,
+  {
+    onCaughtError: onCaughtErrorProd,
+    onRecoverableError: onRecoverableErrorProd,
+    onUncaughtError: onUncaughtErrorProd,
+  }
+);

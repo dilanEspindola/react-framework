@@ -23,7 +23,13 @@
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false
+    "noPropertyAccessFromIndexSignature": false,
+    "baseUrl": ".",
+    "paths": {
+      "public": ["./public/*"],
+      "@/*": ["./src/*"],
+      "@/helpers/*": ["./src/helpers/*"]
+    }
   },
-  "include": ["./src/**/*", "declarations.d.ts"]
+  "include": ["./src/**/*", "declarations.d.ts", "server/server.tsx"]
 }

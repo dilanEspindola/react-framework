@@ -1,6 +1,7 @@
 import { useState } from "react";
-import image from "../../public/image2.jpg";
-import { getRandomToken } from "../helpers/get-token.ts";
+import image from "public/image2.jpg";
+// import { getRandomToken } from "../helpers/get-token.ts";
+import { getRandomToken } from "@/helpers/get-token.ts";
 import styles from "../styles/app.module.css";
 import { Link } from "wouter";
 
