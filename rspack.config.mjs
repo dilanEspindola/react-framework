@@ -96,9 +96,7 @@ export default {
       minChunks: 1,
       cacheGroups: {
         pagesDir: {
-          // test: /[\\/]pages[\\/]/,
           test: /[\\/]src[\\/]pages[\\/].*\.tsx?$/,
-          // test: "./src/pages/**/*",
           name(module, chunks, cacheGroupKey) {
             const match = module.resource.match(
               /src[\\/]pages[\\/]([^\\/]+)\/page\.tsx?$/
